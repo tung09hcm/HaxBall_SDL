@@ -9,7 +9,9 @@ class Player {
 public:
     float x, y;  // Tọa độ của Player
     int width, height;  // Kích thước ảnh của Player
-    bool main;
+    bool shoot;
+    bool tar;
+    bool collision;
     SDL_Texture* texture;  // Texture của Player
     string img_path;
 
@@ -18,18 +20,17 @@ public:
         texture = loadTexture(tex, renderer);
         // Lấy kích thước từ texture
         SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-        main = false;
+        tar = false;
+        shoot = false;
     }
 
     // Hàm vẽ player trên màn hình
     void render(SDL_Renderer* renderer) {
         SDL_Rect dstRect = { x, y, width, height };
         SDL_RenderCopy(renderer, texture, NULL, &dstRect);
-        // Đặt màu trắng cho renderer
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // (r, g, b, a) màu trắng
 
-        // Vẽ khung trắng quanh đối tượng
-        SDL_RenderDrawRect(renderer, &dstRect);
+        
+        
     }
 
     // Hàm xử lý di chuyển
@@ -40,7 +41,7 @@ public:
                 y -= speed;  // Di chuyển lên
         }
         if (keyState[SDL_SCANCODE_S]) {
-            if ( y + speed + 64 <= screenHeight)
+            if ( y + speed + 32 <= screenHeight)
                 y += speed;  // Di chuyển xuống
         }
         if (keyState[SDL_SCANCODE_A]) {
@@ -50,6 +51,17 @@ public:
         if (keyState[SDL_SCANCODE_D]) {
             if( x+ speed + 64 <= screenWidth)
                 x += speed;  // Di chuyển sang phải
+        }
+        if (keyState[SDL_SCANCODE_SPACE]) {
+            // Đặt màu trắng cho renderer
+            cout << "PRESS SPACE" << endl;
+            shoot = true;
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // (r, g, b, a) màu trắng
+            drawCircleWithBorder(renderer, x + 32, y + 32, 40, 5);
+            SDL_RenderPresent(renderer);
+            if (!collision) {
+                shoot = false;
+            }
         }
     }
     ~Player() {

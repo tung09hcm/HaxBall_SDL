@@ -6,24 +6,9 @@
 #include "Player.h"
 #include "Map.h"
 #include "Ball.h"
-
+#include "Cal.h"
 using namespace std;
-bool cal_distance(float player_x, float player_y, float ball_x, float ball_y)
-{
-    float delta_x = player_x + 32 - ball_x - 16;
-    float delta_y = player_y + 32 - ball_y - 16;
-    float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
 
-    cout << "distance: " << distance << endl;
-
-    // Kiểm tra nếu khoảng cách nhỏ hơn hoặc bằng tổng bán kính
-    if (distance <= 48 )
-    {
-        std::cout << "Collision detected" << std::endl;
-        return true;
-    }
-    return false;
-}
 // Hàm khởi tạo SDL
 bool init(SDL_Window*& window, SDL_Renderer*& renderer, const int width, const int height) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -62,7 +47,6 @@ void drawThickRect(SDL_Renderer* renderer, SDL_Rect rect, int thickness) {
 }
 
 
-
 int main(int argc, char* args[]) {
 
     // Khởi tạo SDL
@@ -76,8 +60,8 @@ int main(int argc, char* args[]) {
     }
 
     // Tạo đối tượng Player
-    Player player(screenWidth / 4 - 32, screenHeight / 2 - 32, "argentina.png");
-    Ball ball(screenWidth / 2 - 64, screenHeight / 2 - 32);
+    Player *player = new Player(screenWidth / 4 - 32, screenHeight / 2 - 32, "argentina.png");
+    Ball *ball = new Ball(screenWidth / 2 - 64, screenHeight / 2 - 32);
     bool quit = false;
 
     SDL_Event e;
@@ -101,8 +85,8 @@ int main(int argc, char* args[]) {
         const Uint8* keyState = SDL_GetKeyboardState(NULL);
 
         // Xử lý input
-        player.handleInput(keyState);
-        ball.update();
+        player->handleInput(keyState);
+        /*-> dùng vòng lặp hết player */ball->update(player);
         // Xóa màn hình
         SDL_RenderClear(renderer);
         // Vẽ Map
@@ -115,16 +99,33 @@ int main(int argc, char* args[]) {
         drawThickRect(renderer, goal_right, thickness);
         drawThickRect(renderer, rect_ext, thickness);
         drawCircleWithBorder(renderer, 604, 450, 100, 3);
-        drawCircleWithBorder(renderer, screenWidth / 2 - 64 + 16, screenHeight / 2 - 32 + 16, 32, 3);
-        drawCircleWithBorder(renderer, player.x + 32, player.y + 32, 64, 3);
-        cal_distance(player.x,player.y, ball.x, ball.y);
-        
-        player.render(renderer);
-        ball.render(renderer);
-        
 
-        // Vẽ player
+        if (cal_distance(player, ball)) {
+            player->tar = true;
+            ball->tar = true;
+            player->collision = true;
+            // Tính toán hướng từ Player đến Ball
+            float dx = ball->x - player->x;
+            float dy = ball->y - player->y;
+
+            // Chuẩn hóa vector hướng
+            float length = sqrt(dx * dx + dy * dy);
+            if (length > 0) {
+                dx /= length;
+                dy /= length;
+            }
+
+            // Áp dụng lực đẩy cho Ball
+            float pushForce = 1.0f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
+            ball->applyForce(dx * pushForce, dy * pushForce);
+        }
+        else {
+            player->tar = false;
+            ball->tar = false;
+        }
         
+        player->render(renderer);
+        ball->render(renderer);
 
         // Cập nhật màn hình
         SDL_RenderPresent(renderer);
@@ -136,6 +137,7 @@ int main(int argc, char* args[]) {
     SDL_DestroyWindow(window);
     IMG_Quit();
     SDL_Quit();
-
+    delete player;
+    delete ball;
     return 0;
 }

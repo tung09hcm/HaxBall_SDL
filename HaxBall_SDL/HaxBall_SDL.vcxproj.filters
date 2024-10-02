@@ -40,9 +40,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\..\..\..\Desktop\ryo\Lập trình game\BTL2-HaxBall\resource\X\soccer-ball.png">
-      <Filter>Source Files\assests</Filter>
-    </Image>
     <Image Include="soccer-ball.png">
       <Filter>Source Files\assests</Filter>
     </Image>
