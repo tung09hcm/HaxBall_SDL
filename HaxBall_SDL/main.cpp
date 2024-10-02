@@ -1,109 +1,95 @@
 ﻿#include <SDL.h>
 #include <SDL_image.h>
 #include <iostream>
-#include <cmath> 
+#include <string>
+#include "Common.h"
+#include "Player.h"
+#include "Map.h"
+using namespace std;
 
-//Starts up SDL and creates window
-bool init();
-
-//Loads media
-bool loadMedia();
-
-//Frees media and shuts down SDL
-void close();
-
-
-//The window we'll be rendering to
-SDL_Window* gWindow = NULL;
-
-//The surface contained by the window
-SDL_Surface* gScreenSurface = NULL;
-
-//The image we will load and show on the screen
-SDL_Surface* gHelloWorld = NULL;
-
-bool init()
-{
-    //Initialization flag
-    bool success = true;
-
-    //Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) < 0)
-    {
-        printf("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
-        success = false;
-    }
-    else
-    {
-        //Create window
-        gWindow = SDL_CreateWindow("SDL Tutorial", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-        if (gWindow == NULL)
-        {
-            printf("Window could not be created! SDL_Error: %s\n", SDL_GetError());
-            success = false;
-        }
-        else
-        {
-            //Get window surface
-            gScreenSurface = SDL_GetWindowSurface(gWindow);
-        }
+// Hàm khởi tạo SDL
+bool init(SDL_Window*& window, SDL_Renderer*& renderer, const int width, const int height) {
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        std::cerr << "Không thể khởi tạo SDL: " << SDL_GetError() << std::endl;
+        return false;
     }
 
-    return success;
+    window = SDL_CreateWindow("HaxBAll", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, width, height, SDL_WINDOW_SHOWN);
+    if (window == nullptr) {
+        std::cerr << "Không thể tạo cửa sổ: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    if (renderer == nullptr) {
+        std::cerr << "Không thể tạo renderer: " << SDL_GetError() << std::endl;
+        return false;
+    }
+
+    if (!(IMG_Init(IMG_INIT_PNG) & IMG_INIT_PNG)) {
+        std::cerr << "Không thể khởi tạo SDL_image: " << IMG_GetError() << std::endl;
+        return false;
+    }
+
+    return true;
 }
-bool loadMedia()
-{
-    //Loading success flag
-    bool success = true;
+// Hàm tải texture từ file PNG
 
-    //Load splash image
-    gHelloWorld = SDL_LoadBMP("02_getting_an_image_on_the_screen/hello_world.bmp");
-    if (gHelloWorld == NULL)
-    {
-        printf("Unable to load image %s! SDL Error: %s\n", "02_getting_an_image_on_the_screen/hello_world.bmp", SDL_GetError());
-        success = false;
+
+int main(int argc, char* args[]) {
+
+    // Khởi tạo SDL
+    if (!init(window, renderer, screenWidth, screenHeight)) {
+        std::cerr << "Khởi tạo thất bại!" << std::endl;
+        return -1;
     }
 
-    return success;
-}
-void close()
-{
-    //Deallocate surface
-    SDL_FreeSurface(gHelloWorld);
-    gHelloWorld = NULL;
 
-    //Destroy window
-    SDL_DestroyWindow(gWindow);
-    gWindow = NULL;
+    // Tạo đối tượng Player
+    Player player(screenWidth / 2, screenHeight / 2, "argentina.png");
 
-    //Quit SDL subsystems
+    bool quit = false;
+    SDL_Event e;
+
+    // Init Map
+    initMap("Green.png");
+    // Game loop
+    while (!quit) {
+        // Kiểm tra sự kiện
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                quit = true;
+            }
+        }
+
+        // Lấy trạng thái bàn phím
+        const Uint8* keyState = SDL_GetKeyboardState(NULL);
+        SDL_Rect rect = { 108, 100, 1000, 700 };
+        // Xử lý input
+        player.handleInput(keyState);
+
+        // Xóa màn hình
+        SDL_RenderClear(renderer);
+        // Vẽ Map
+        loadMap();
+        // Đặt màu vẽ là màu trắng
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Màu trắng
+
+        // Vẽ hình chữ nhật chỉ có viền
+        SDL_RenderDrawRect(renderer, &rect);
+        // Vẽ player
+        player.render(renderer);
+
+        // Cập nhật màn hình
+        SDL_RenderPresent(renderer);
+    }
+
+    // Dọn dẹp
+    
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    IMG_Quit();
     SDL_Quit();
-}
-int main(int argc, char* args[])
-{
-    //Start up SDL and create window
-    if (!init())
-    {
-        printf("Failed to initialize!\n");
-    }
-    else
-    {
-        //Load media
-        if (!loadMedia())
-        {
-            printf("Failed to load media!\n");
-        }
-        else
-        {
-            //Apply the image
-            SDL_BlitSurface(gHelloWorld, NULL, gScreenSurface, NULL);
-            //Hack to get window to stay up
-            SDL_Event e; bool quit = false; while (quit == false) { while (SDL_PollEvent(&e)) { if (e.type == SDL_QUIT) quit = true; } }
-        }
-    }
-
-    //Free resources and close SDL
-    close();
 
     return 0;
 }

@@ -21,6 +21,22 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Common.h" />
+    <ClInclude Include="Map.h" />
+    <ClInclude Include="Player.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\ryo\Lập trình game\BTL2-HaxBall\resource\X\soccer-ball.png" />
+    <Image Include="argentina.png" />
+    <Image Include="brazil-.png" />
+    <Image Include="france.png" />
+    <Image Include="germany.png" />
+    <Image Include="Green.png" />
+    <Image Include="italy.png" />
+    <Image Include="soccer-ball.png" />
+    <Image Include="spain.png" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

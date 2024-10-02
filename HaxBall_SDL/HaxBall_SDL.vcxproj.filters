@@ -13,10 +13,53 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Source Files\assests">
+      <UniqueIdentifier>{7e1d7058-9f67-4da3-9399-51f6762de3d2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Player.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Common.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Map.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\..\..\Desktop\ryo\Lập trình game\BTL2-HaxBall\resource\X\soccer-ball.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="soccer-ball.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="spain.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="italy.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="germany.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="france.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="brazil-.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="argentina.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="Green.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
   </ItemGroup>
 </Project>
