@@ -5,8 +5,25 @@
 #include "Common.h"
 #include "Player.h"
 #include "Map.h"
-using namespace std;
+#include "Ball.h"
 
+using namespace std;
+bool cal_distance(float player_x, float player_y, float ball_x, float ball_y)
+{
+    float delta_x = player_x + 32 - ball_x - 16;
+    float delta_y = player_y + 32 - ball_y - 16;
+    float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
+
+    cout << "distance: " << distance << endl;
+
+    // Kiểm tra nếu khoảng cách nhỏ hơn hoặc bằng tổng bán kính
+    if (distance <= 48 )
+    {
+        std::cout << "Collision detected" << std::endl;
+        return true;
+    }
+    return false;
+}
 // Hàm khởi tạo SDL
 bool init(SDL_Window*& window, SDL_Renderer*& renderer, const int width, const int height) {
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
@@ -44,38 +61,7 @@ void drawThickRect(SDL_Renderer* renderer, SDL_Rect rect, int thickness) {
     }
 }
 
-void drawCircle(SDL_Renderer* renderer, int centerX, int centerY, int radius) {
-    int offsetX = radius, offsetY = 0;
-    int decisionOver2 = 1 - offsetX; // Quyết định cho vòng tròn (thuật toán Bresenham)
 
-    while (offsetX >= offsetY) {
-        // Vẽ 8 điểm đối xứng nhau của hình tròn
-        SDL_RenderDrawPoint(renderer, centerX + offsetX, centerY + offsetY);
-        SDL_RenderDrawPoint(renderer, centerX + offsetY, centerY + offsetX);
-        SDL_RenderDrawPoint(renderer, centerX - offsetY, centerY + offsetX);
-        SDL_RenderDrawPoint(renderer, centerX - offsetX, centerY + offsetY);
-        SDL_RenderDrawPoint(renderer, centerX - offsetX, centerY - offsetY);
-        SDL_RenderDrawPoint(renderer, centerX - offsetY, centerY - offsetX);
-        SDL_RenderDrawPoint(renderer, centerX + offsetY, centerY - offsetX);
-        SDL_RenderDrawPoint(renderer, centerX + offsetX, centerY - offsetY);
-
-        offsetY++;
-        if (decisionOver2 <= 0) {
-            decisionOver2 += 2 * offsetY + 1;
-        }
-        else {
-            offsetX--;
-            decisionOver2 += 2 * (offsetY - offsetX) + 1;
-        }
-    }
-}
-
-void drawCircleWithBorder(SDL_Renderer* renderer, int centerX, int centerY, int radius, int borderThickness) {
-    // Vẽ các hình tròn từ lớn đến nhỏ để tạo viền
-    for (int i = 0; i < borderThickness; ++i) {
-        drawCircle(renderer, centerX, centerY, radius - i);
-    }
-}
 
 int main(int argc, char* args[]) {
 
@@ -84,12 +70,16 @@ int main(int argc, char* args[]) {
         std::cerr << "Khởi tạo thất bại!" << std::endl;
         return -1;
     }
-
+    if (renderer == nullptr)
+    {
+        cout << "ERROR renderer is nullptr" << endl;
+    }
 
     // Tạo đối tượng Player
-    Player player(screenWidth / 2 - 32, screenHeight / 2 - 32, "argentina.png");
-
+    Player player(screenWidth / 4 - 32, screenHeight / 2 - 32, "argentina.png");
+    Ball ball(screenWidth / 2 - 64, screenHeight / 2 - 32);
     bool quit = false;
+
     SDL_Event e;
     SDL_Rect rect = { 108, 100, 1000, 700 };
     SDL_Rect rect_ext = { 108, 100, 500, 700 };
@@ -112,7 +102,7 @@ int main(int argc, char* args[]) {
 
         // Xử lý input
         player.handleInput(keyState);
-
+        ball.update();
         // Xóa màn hình
         SDL_RenderClear(renderer);
         // Vẽ Map
@@ -125,8 +115,16 @@ int main(int argc, char* args[]) {
         drawThickRect(renderer, goal_right, thickness);
         drawThickRect(renderer, rect_ext, thickness);
         drawCircleWithBorder(renderer, 604, 450, 100, 3);
-        // Vẽ player
+        drawCircleWithBorder(renderer, screenWidth / 2 - 64 + 16, screenHeight / 2 - 32 + 16, 32, 3);
+        drawCircleWithBorder(renderer, player.x + 32, player.y + 32, 64, 3);
+        cal_distance(player.x,player.y, ball.x, ball.y);
+        
         player.render(renderer);
+        ball.render(renderer);
+        
+
+        // Vẽ player
+        
 
         // Cập nhật màn hình
         SDL_RenderPresent(renderer);
