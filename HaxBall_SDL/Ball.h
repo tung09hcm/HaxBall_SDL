@@ -29,34 +29,67 @@ public:
 		SDL_Rect dstRect = { x, y, width, height };
 		SDL_RenderCopy(renderer, texture, NULL, &dstRect);
 		// Đặt màu trắng cho renderer
-		// SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // (r, g, b, a) màu trắng
+		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
 		// Vẽ khung trắng quanh đối tượng
-		// SDL_RenderDrawRect(renderer, &dstRect);
+		SDL_RenderDrawRect(renderer, &dstRect);
 	}
 	void update(Player* player) {
 		// cout << "ball_x: " << this->x + 16;
 		// cout << "  ball_y: " << this->y + 16 << endl;
 		if (player == nullptr) return;
 		// Nếu người chơi thực hiện cú sút, tăng vận tốc quả bóng
-		if (player->shoot && player->collision) {
-			// Tăng vận tốc của bóng theo một hệ số, ví dụ là 1.5 lần
-			cout << "BANG !!!" << endl;
-			velocityX *= 2.0f;
-			velocityY *= 2.0f;
+		if (player->shoot && (player->collision)) {
+			velocityX *= 2.5f;
+			velocityY *= 2.5f;
 			player->shoot = false;
 			player->collision = false;
 		}
-		// Kiểm tra va chạm với biên
-		if (x + velocityX - 16 <= 108 || x + velocityX + 16 >= 1108) {
-			// Bật ngược lại theo trục X
-			velocityX = -velocityX;
-		}
+		cout << "x + velocityX: " << x + velocityX;
+		cout << "    y + velocityY: " << y + velocityY << endl;
+		if (x + velocityX <= 108 && y + velocityY >= 310 && y + velocityY + 16 <= 590)
+		{
+			cout << "GOAL LEFT" << endl;
+			// Kiểm tra va chạm với biên
+			if (x + velocityX <= 78 ) {
+				// Bật ngược lại theo trục X
+				velocityX = -velocityX;
+			}
 
-		if (y + velocityY - 16 <= 100 || y + velocityY + 16 >= 800) {
-			// Bật ngược lại theo trục Y
-			velocityY = -velocityY;
+			if (y + velocityY >= 310 || y + velocityY + 16 <= 590) {
+				// Bật ngược lại theo trục Y
+				velocityY = -velocityY;
+			}
 		}
+		else if (x + velocityX + 16 >= 1108 && y + velocityY >= 310 && y + velocityY + 16 <= 590)
+		{
+			cout << "GOAL RIGHT" << endl;
+			// Kiểm tra va chạm với biên
+			if (x + velocityX + 16 >= 1138) {
+				// Bật ngược lại theo trục X
+				velocityX = -velocityX;
+			}
+
+			if (y + velocityY >= 310 || y + velocityY + 16 <= 590) {
+				// Bật ngược lại theo trục Y
+				velocityY = -velocityY;
+			}
+		}
+		else
+		{
+			// Kiểm tra va chạm với biên
+			if (x + velocityX <= 108 || x + velocityX + 16 >= 1108) {
+
+				// Bật ngược lại theo trục X
+				velocityX = -velocityX;
+			}
+
+			if (y + velocityY <= 100 || y + velocityY + 16 >= 800) {
+				// Bật ngược lại theo trục Y
+				velocityY = -velocityY;
+			}
+		}
+		
 
 		// Cập nhật vị trí
 		x += velocityX;

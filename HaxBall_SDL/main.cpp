@@ -2,6 +2,7 @@
 #include <SDL_image.h>
 #include <iostream>
 #include <string>
+#include <vector>
 #include "Common.h"
 #include "Player.h"
 #include "Map.h"
@@ -61,6 +62,12 @@ int main(int argc, char* args[]) {
 
     // Tạo đối tượng Player
     Player *player = new Player(screenWidth / 4 - 32, screenHeight / 2 - 32, "argentina.png");
+    Player* player1 = new Player(screenWidth / 6 - 32, screenHeight / 2 - 32, "spain.png");
+
+    vector<Player* > Players;
+    Players.push_back(player);
+    Players.push_back(player1);
+
     Ball *ball = new Ball(screenWidth / 2 - 64, screenHeight / 2 - 32);
     bool quit = false;
 
@@ -85,8 +92,12 @@ int main(int argc, char* args[]) {
         const Uint8* keyState = SDL_GetKeyboardState(NULL);
 
         // Xử lý input
-        player->handleInput(keyState);
-        /*-> dùng vòng lặp hết player */ball->update(player);
+        player->handleInput(keyState); player->tar = true;
+        player1->handleInput(keyState);
+
+
+        /*-> dùng vòng lặp hết player */
+        ball->update(player);
         // Xóa màn hình
         SDL_RenderClear(renderer);
         // Vẽ Map
@@ -99,32 +110,64 @@ int main(int argc, char* args[]) {
         drawThickRect(renderer, goal_right, thickness);
         drawThickRect(renderer, rect_ext, thickness);
         drawCircleWithBorder(renderer, 604, 450, 100, 3);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        // Vẽ đường thẳng (từ điểm x1, y1 đến x2, y2)
+        // SDL_RenderDrawLine(renderer, 108, 100, 108, 800);
+        // SDL_RenderDrawLine(renderer, 108, 100, 1108, 100);
+        // SDL_RenderDrawLine(renderer, 108, 800, 1108, 800);
+        // SDL_RenderDrawLine(renderer, 1108, 100, 1108, 800);
 
-        if (cal_distance(player, ball)) {
-            player->tar = true;
-            ball->tar = true;
-            player->collision = true;
-            // Tính toán hướng từ Player đến Ball
-            float dx = ball->x - player->x;
-            float dy = ball->y - player->y;
+        // SDL_RenderDrawLine(renderer, 78, 310, 1138, 310);
+        // SDL_RenderDrawLine(renderer, 78, 590, 1138, 590);
+        // SDL_RenderDrawLine(renderer, 78, 310, 78, 590);
+        // SDL_RenderDrawLine(renderer, 1138, 310, 1138, 590);
+        for (Player* x : Players)
+        {
+            if (cal_distance(x, ball)) {
 
-            // Chuẩn hóa vector hướng
-            float length = sqrt(dx * dx + dy * dy);
-            if (length > 0) {
-                dx /= length;
-                dy /= length;
+                // player->tar = true;
+                ball->tar = true;
+                x->collision = true;
+
+                float ballx = ball->x + 16;
+                float bally = ball->y + 16;
+                float xx = x->x + 32;
+                float xy = x->y + 32;
+
+                if (ballx > xx + 32) x->collision_right = true;
+                if (ballx < xx - 32) x->collision_left = true;
+                if (bally > xy + 32) x->collision_down = true;
+                if (bally < xy - 32) x->collision_top = true;
+
+                // Tính toán hướng từ Player đến Ball
+                float dx = ball->x - x->x;
+                float dy = ball->y - x->y;
+
+                // Chuẩn hóa vector hướng
+                float length = sqrt(dx * dx + dy * dy);
+
+                if (length > 0) {
+                    dx /= length;
+                    dy /= length;
+                }
+
+                // Áp dụng lực đẩy cho Ball
+                float pushForce = 0.98f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
+                ball->applyForce(dx * pushForce, dy * pushForce);
             }
+            else {
+                // player->tar = false;
+                ball->tar = false;
+                x->collision = false;
+                x->collision_left = false;
+                x->collision_right = false;
+                x->collision_down = false;
+                x->collision_top = false;
+            }
+            x->render(renderer, x->redTexture);
+        }
 
-            // Áp dụng lực đẩy cho Ball
-            float pushForce = 1.0f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
-            ball->applyForce(dx * pushForce, dy * pushForce);
-        }
-        else {
-            player->tar = false;
-            ball->tar = false;
-        }
-        
-        player->render(renderer);
+
         ball->render(renderer);
 
         // Cập nhật màn hình

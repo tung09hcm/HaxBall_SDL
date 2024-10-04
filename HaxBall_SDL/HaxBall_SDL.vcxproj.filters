@@ -64,5 +64,11 @@
     <Image Include="Green.png">
       <Filter>Source Files\assests</Filter>
     </Image>
+    <Image Include="blue.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
+    <Image Include="red.png">
+      <Filter>Source Files\assests</Filter>
+    </Image>
   </ItemGroup>
 </Project>

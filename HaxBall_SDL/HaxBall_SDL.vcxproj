@@ -30,11 +30,13 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="argentina.png" />
+    <Image Include="blue.png" />
     <Image Include="brazil-.png" />
     <Image Include="france.png" />
     <Image Include="germany.png" />
     <Image Include="Green.png" />
     <Image Include="italy.png" />
+    <Image Include="red.png" />
     <Image Include="soccer-ball.png" />
     <Image Include="spain.png" />
   </ItemGroup>
