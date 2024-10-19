@@ -152,7 +152,7 @@ int main(int argc, char* args[]) {
                 }
 
                 // Áp dụng lực đẩy cho Ball
-                float pushForce = 0.98f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
+                float pushForce = 0.5f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
                 ball->applyForce(dx * pushForce, dy * pushForce);
             }
             else {
