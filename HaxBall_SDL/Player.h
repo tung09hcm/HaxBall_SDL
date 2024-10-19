@@ -11,6 +11,7 @@ public:
     int width, height;  // Kích thước ảnh của Player
     bool shoot;
     bool tar;
+    bool next;
     bool collision;
     float velocityX, velocityY;
     bool collision_left;
@@ -23,15 +24,17 @@ public:
     SDL_Texture* redTexture;
     SDL_Texture* grayTexture;
 
+    string player_type;
+    float speed = 0.6;
     // Constructor
-    Player(float startX, float startY, string tex) : x(startX), y(startY), img_path(tex) {
+    Player(float startX, float startY, string tex, string type) : x(startX), y(startY), img_path(tex), player_type(type) {
         shootStartTime = 0;
         velocityX = 0;
         velocityY = 0;
         texture = loadTexture(tex, renderer);
         // Lấy kích thước từ texture
         SDL_QueryTexture(texture, NULL, NULL, &width, &height);
-        tar = false;
+        tar = false; next = false;
         shoot = false;
         collision = false;
         collision_left = false;
@@ -52,6 +55,17 @@ public:
 
         // Nếu player này đang được điều khiển, vẽ `red.png`
         if (tar) {
+            int indicatorWidth, indicatorHeight;
+            SDL_QueryTexture(indicatorTexture, NULL, NULL, &indicatorWidth, &indicatorHeight);
+
+            // Tọa độ của chỉ định `red.png` (vẽ lệch lên 32 pixel theo yêu cầu)
+            SDL_Rect dstRect1 = { x + 16, y - 32, indicatorWidth, indicatorHeight };
+
+            // Vẽ `red.png` để chỉ định nhân vật đang được điều khiển
+            SDL_RenderCopy(renderer, indicatorTexture, NULL, &dstRect1);
+        }
+        else if (next)
+        {
             int indicatorWidth, indicatorHeight;
             SDL_QueryTexture(indicatorTexture, NULL, NULL, &indicatorWidth, &indicatorHeight);
 
@@ -130,7 +144,7 @@ public:
     // Hàm xử lý di chuyển
     void handleInput(const Uint8* keyState) {
         if (!tar) return;
-        float speed = 0.6;
+        
 
 
         if (keyState[SDL_SCANCODE_W]) {
@@ -249,4 +263,333 @@ public:
         if (x + speed + 64 <= screenWidth && !collision_right)
             x += speed;  // Di chuyển sang phải
     }
-};
+
+    void moveTowards(float targetX, float targetY) {
+
+        // Tính khoảng cách từ vị trí hiện tại đến điểm đích
+        float dx = targetX - this->x;
+        float dy = targetY - this->y;
+
+        // Tính độ dài của vector chỉ hướng
+        float distance = std::sqrt(dx * dx + dy * dy);
+
+        // Kiểm tra nếu đã tới gần điểm đích (hoặc đã tới)
+        if (distance < 1e-3) {
+            // Đặt vị trí chính xác là điểm đích nếu quá gần
+            this->x = targetX;
+            this->y = targetY;
+            return;
+        }
+
+        // Tính hướng di chuyển (vector đơn vị)
+        float directionX = dx / distance;
+        float directionY = dy / distance;
+
+        // Cập nhật vị trí dựa trên tốc độ
+        this->x += directionX * speed;
+        this->y += directionY * speed;
+
+        // Kiểm tra nếu vượt qua điểm đích thì dừng tại điểm đích
+        if (std::abs(targetX - this->x) < speed) this->x = targetX;
+        if (std::abs(targetY - this->y) < speed) this->y = targetY;
+    }
+
+    void move(string nameArea)
+    {
+        // khúc này mệt vcl
+        // nhớ xử lý cho bot hoặc P2 CM1 LCB1 RCB1 LW1 RW1
+        if (!tar)
+        {
+            if (nameArea == "A")
+            {
+                // Xử lý cho khu vực A
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else 
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "B")
+            {
+                // Xử lý cho khu vực B
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "C")
+            {
+                // Xử lý cho khu vực C
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "D")
+            {
+                // Xử lý cho khu vực D
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "E")
+            {
+                // Xử lý cho khu vực E
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "F")
+            {
+                // Xử lý cho khu vực F
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "G")
+            {
+                // Xử lý cho khu vực G
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "H")
+            {
+                // Xử lý cho khu vực H
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "I")
+            {
+                // Xử lý cho khu vực I
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "J")
+            {
+                // Xử lý cho khu vực J
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else if (nameArea == "K")
+            {
+                // Xử lý cho khu vực K
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+            else
+            {
+                // Xử lý cho khu vực L
+                if (player_type == "CM")
+                {
+                    // Xử lý cho player CM
+                }
+                else if (player_type == "LCB")
+                {
+                    // Xử lý cho player LCB
+                }
+                else if (player_type == "RCB")
+                {
+                    // Xử lý cho player RCB
+                }
+                else if (player_type == "LW")
+                {
+                    // Xử lý cho player LW
+                }
+                else
+                {
+                    // Xử lý cho player RW
+                }
+            }
+
+        }
+    }
+}
+;

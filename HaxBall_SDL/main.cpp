@@ -76,11 +76,34 @@ void switchPlayer(const Uint8* keyState, vector<Player*>& Players, bool& switchP
         switchPressed = false;  // Reset the flag when the key is released
     }
 }
+bool isPointInsideRectangle(float x, float y, float rectLeft, float rectTop, float rectRight, float rectBottom) {
+    // Kiểm tra nếu x nằm giữa rectLeft và rectRight
+    if (x >= rectLeft && x <= rectRight) {
+        // Kiểm tra nếu y nằm giữa rectTop và rectBottom
+        if (y >= rectTop && y <= rectBottom) {
+            return true;  // Điểm nằm trong hình chữ nhật
+        }
+    }
+    return false;  // Điểm nằm ngoài hình chữ nhật
+}
+string getBallAreaName(float x, float y)
+{
+    if (isPointInsideRectangle(x, y, 108, 100, 358, 310)) return "A";
+    if (isPointInsideRectangle(x, y, 358, 100, 608, 310)) return "B";
+    if (isPointInsideRectangle(x, y, 608, 100, 858, 310)) return "C";
+    if (isPointInsideRectangle(x, y, 858, 100, 1108, 310)) return "D";
 
+    if (isPointInsideRectangle(x, y, 108, 310, 358, 590)) return "E";
+    if (isPointInsideRectangle(x, y, 358, 310, 608, 590)) return "F";
+    if (isPointInsideRectangle(x, y, 608, 310, 858, 590)) return "G";
+    if (isPointInsideRectangle(x, y, 858, 310, 1108, 590)) return "H";
 
+    if (isPointInsideRectangle(x, y, 108, 590, 358, 800)) return "I";
+    if (isPointInsideRectangle(x, y, 358, 590, 608, 800)) return "J";
+    if (isPointInsideRectangle(x, y, 608, 590, 858, 800)) return "K";
+    if (isPointInsideRectangle(x, y, 858, 590, 1108, 800)) return "L";
 
-
-
+}
 int main(int argc, char* args[]) {
 
     // Khởi tạo SDL
@@ -107,19 +130,19 @@ int main(int argc, char* args[]) {
     // Tạo đối tượng Player
     vector<Player*> Players;
 
-    // 1 Goalkeeper
-    Player* goalkeeper = new Player(100, screenHeight / 2 , "germany.png");  // Positioned near the left middle of the screen
-    Players.push_back(goalkeeper);
+    // 1 CentralMid
+    Player* centralmid = new Player(400, screenHeight / 2 , "germany.png" ,"CM");  // Positioned near the left middle of the screen
+    Players.push_back(centralmid);
 
     // 2 Defenders
-    Player* defender1 = new Player(300, screenHeight / 3, "italy.png");  // Positioned slightly to the right and higher than the goalkeeper
-    Player* defender2 = new Player(300, 2 * screenHeight / 3, "france.png");  // Positioned slightly to the right and lower than the goalkeeper
+    Player* defender1 = new Player(200, screenHeight / 3, "italy.png", "LCB");  // Positioned slightly to the right and higher than the goalkeeper
+    Player* defender2 = new Player(200, 2 * screenHeight / 3, "france.png" , "RCB");  // Positioned slightly to the right and lower than the goalkeeper
     Players.push_back(defender1);
     Players.push_back(defender2);
 
     // 2 Forwards
-    Player* forward1 = new Player(500, screenHeight / 4, "spain.png");  // Positioned further to the right and higher
-    Player* forward2 = new Player(500, 3 * screenHeight / 3 - screenHeight / 4, "argentina.png");  // Positioned further to the right and lower
+    Player* forward1 = new Player(500, screenHeight / 4, "spain.png", "LW");  // Positioned further to the right and higher
+    Player* forward2 = new Player(500, 3 * screenHeight / 3 - screenHeight / 4, "argentina.png", "RW");  // Positioned further to the right and lower
     Players.push_back(forward1);
     Players.push_back(forward2);
 
@@ -160,18 +183,21 @@ int main(int argc, char* args[]) {
         loadMap();
 
         // Vẽ hình chữ nhật chỉ có viền
-        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Màu viền đỏ
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Màu viền trắng
         drawThickRect(renderer, rect, thickness);
         drawThickRect(renderer, goal_left, thickness);
         drawThickRect(renderer, goal_right, thickness);
         drawThickRect(renderer, rect_ext, thickness);
         drawCircleWithBorder(renderer, 604, 450, 100, 3);
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // đỏ
         // Vẽ đường thẳng (từ điểm x1, y1 đến x2, y2)
+        // Màu viền đỏ
         SDL_RenderDrawLine(renderer, 108, 100, 108, 800);
         SDL_RenderDrawLine(renderer, 108, 100, 1108, 100);
         SDL_RenderDrawLine(renderer, 108, 800, 1108, 800);
         SDL_RenderDrawLine(renderer, 1108, 100, 1108, 800);
+
+        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // xanh dương
 
         SDL_RenderDrawLine(renderer, 78, 310, 1138, 310);
         SDL_RenderDrawLine(renderer, 78, 590, 1138, 590);
@@ -192,7 +218,7 @@ int main(int argc, char* args[]) {
             float goalY = screenHeight / 2;  // Center of the screen height
 
             // Make each player aim for the ball and shoot
-            x->moveToBallAndShoot(ballX, ballY, goalX, goalY);
+            // if(!x->tar) x->moveToBallAndShoot(ballX, ballY, goalX, goalY);
 
             if (cal_distance(x, ball)) {
 
@@ -226,7 +252,7 @@ int main(int argc, char* args[]) {
                 }
 
                 // Áp dụng lực đẩy cho Ball
-                float pushForce = 0.5f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
+                float pushForce = 0.2f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
                 ball->applyForce(dx * pushForce, dy * pushForce);
                 
                 
@@ -244,7 +270,7 @@ int main(int argc, char* args[]) {
             // hàm này chỉ vẽ cho x nào đg có thuộc tính tar là true
             ball->update(x);
             x->render(renderer, x->redTexture);
-            
+            // x->render(renderer, x->grayTexture);
              
         }
         //////////////////////////////////////////////////////////////////////////////

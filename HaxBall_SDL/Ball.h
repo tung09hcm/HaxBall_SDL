@@ -46,7 +46,7 @@ public:
 
 			cout << "shoot" << endl;
 			cout << "Pre: velocityX: " << velocityX << " velocityY: " << velocityY << endl;
-			velocityX *= 1.5f;
+			velocityX *= 2.5f;
 			cout << "After: velocityX: " << velocityX << " velocityY: " << velocityY << endl;
 			velocityY *= 1.5f;
 			player->shoot = false;
