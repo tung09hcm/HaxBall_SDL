@@ -6,6 +6,7 @@
 #include <cmath>
 
 using namespace std;
+
 SDL_Window* window = nullptr;
 SDL_Renderer* renderer = nullptr;
 SDL_Texture* loadTexture(const std::string& path, SDL_Renderer* renderer);

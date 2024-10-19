@@ -38,18 +38,26 @@ public:
 		// cout << "ball_x: " << this->x + 16;
 		// cout << "  ball_y: " << this->y + 16 << endl;
 		if (player == nullptr) return;
+
+
+
 		// Nếu người chơi thực hiện cú sút, tăng vận tốc quả bóng
 		if (player->shoot && (player->collision)) {
-			velocityX *= 2.5f;
-			velocityY *= 2.5f;
+
+			cout << "shoot" << endl;
+			cout << "Pre: velocityX: " << velocityX << " velocityY: " << velocityY << endl;
+			velocityX *= 1.5f;
+			cout << "After: velocityX: " << velocityX << " velocityY: " << velocityY << endl;
+			velocityY *= 1.5f;
 			player->shoot = false;
 			player->collision = false;
+			//player->shoot = false;
 		}
-		cout << "x + velocityX: " << x + velocityX;
-		cout << "    y + velocityY: " << y + velocityY << endl;
+		// cout << "x + velocityX: " << x + velocityX;
+		// cout << "    y + velocityY: " << y + velocityY << endl;
 		if (x + velocityX <= 108 && y + velocityY >= 310 && y + velocityY + 16 <= 590)
 		{
-			cout << "GOAL LEFT" << endl;
+			// cout << "GOAL LEFT" << endl;
 			// Kiểm tra va chạm với biên
 			if (x + velocityX <= 78 ) {
 				// Bật ngược lại theo trục X
@@ -63,7 +71,7 @@ public:
 		}
 		else if (x + velocityX + 16 >= 1108 && y + velocityY >= 310 && y + velocityY + 16 <= 590)
 		{
-			cout << "GOAL RIGHT" << endl;
+			// cout << "GOAL RIGHT" << endl;
 			// Kiểm tra va chạm với biên
 			if (x + velocityX + 16 >= 1138) {
 				// Bật ngược lại theo trục X
@@ -90,7 +98,6 @@ public:
 			}
 		}
 		
-
 		// Cập nhật vị trí
 		x += velocityX;
 		y += velocityY;
@@ -98,12 +105,13 @@ public:
 		
 
 		// Giảm dần vận tốc (mô phỏng ma sát)
-		velocityX *= 0.995f;
-		velocityY *= 0.995f;
+		velocityX *= 0.999f;
+		velocityY *= 0.999f;
 
 		// Nếu vận tốc quá nhỏ, đặt nó về 0
 		if (fabs(velocityX) < 0.01f) velocityX = 0;
 		if (fabs(velocityY) < 0.01f) velocityY = 0;
+
 	}
 
 

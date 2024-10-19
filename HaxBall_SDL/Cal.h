@@ -17,6 +17,20 @@ bool cal_distance(Player* player, Ball* ball)
     }
     return false;
 }
+bool cal_distance(Player* player, Player* player2)
+{
+    float delta_x = player->x - player2->x;
+    float delta_y = player->y - player2->y;
+    float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
+
+
+    // Kiểm tra nếu khoảng cách nhỏ hơn hoặc bằng tổng bán kính
+    if (distance <= 64)
+    {
+        return true;
+    }
+    return false;
+}
 bool cal_distance_shoot(Player* player, Ball* ball)
 {
     float delta_x = player->x + 32 - ball->x - 16;
