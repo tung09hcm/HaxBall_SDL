@@ -104,7 +104,64 @@ void switchPlayer(const Uint8* keyState, vector<Player*>& Players, bool& switchP
         switchPressed = false;  // Reset cờ khi phím được nhả ra
     }
 }
+void switchPlayer_P2(const Uint8* keyState, vector<Player*>& Players, bool& switchPressed, Ball* ball) {  // Thêm tham số screenWidth
+    if (keyState[SDL_SCANCODE_KP_0]) {
+        if (!switchPressed) {  // Chỉ chuyển đổi nếu phím chưa được nhấn ở frame trước
+            cout << "PRESS 0" << endl;
+            cout << "Players size: " << Players.size() << endl;
 
+            if (Players.size() <= 1) return;  // Không cần chuyển đổi nếu chỉ có 1 player
+
+            bool canSwitch = true;
+
+            // Kiểm tra vị trí của bóng, chỉ cho phép chuyển nếu bóng > screenWidth / 2
+            if (ball->x < screenWidth / 2) {
+                canSwitch = false;
+
+                // Tìm player hiện tại và chuyển sang player khác nếu không phải LCB hoặc RCB
+                for (size_t i = 0; i < Players.size(); i++) {
+                    if (Players[i]->tar2 == true) {  // Tìm player hiện tại
+                        Players[i]->tar2 = false;    // Ngưng kích hoạt player hiện tại
+
+                        // Tìm player tiếp theo có thuộc tính player_type != LCB và != RCB
+                        size_t nextPlayerIndex = (i + 1) % Players.size();
+                        for (size_t j = 0; j < Players.size(); j++) {
+                            size_t candidateIndex = (nextPlayerIndex + j) % Players.size();
+                            if (Players[candidateIndex]->player_type != "LCB1" && Players[candidateIndex]->player_type != "RCB1") {
+                                Players[candidateIndex]->tar2 = true;  // Kích hoạt player mới
+                                canSwitch = true;
+                                break;  // Thoát khỏi vòng lặp sau khi tìm được player hợp lệ
+                            }
+                        }
+
+                        break;  // Thoát khỏi vòng lặp sau khi xử lý xong player hiện tại
+                    }
+                }
+            }
+            else {
+                // Chuyển đổi như bình thường nếu bóng không nằm ở phần phải màn hình
+                for (size_t i = 0; i < Players.size(); i++) {
+                    if (Players[i]->tar2 == true) {  // Tìm player hiện tại
+                        Players[i]->tar2 = false;    // Ngưng kích hoạt player hiện tại
+
+                        // Kích hoạt player tiếp theo
+                        size_t nextPlayerIndex = (i + 1) % Players.size();
+                        Players[nextPlayerIndex]->tar2 = true;
+
+                        break;  // Thoát khỏi vòng lặp sau khi chuyển đổi
+                    }
+                }
+            }
+
+            if (canSwitch) {
+                switchPressed = true;  // Đặt cờ để chỉ ra rằng phím đã được giữ
+            }
+        }
+    }
+    else {
+        switchPressed = false;  // Reset cờ khi phím được nhả ra
+    }
+}
 bool isPointInsideRectangle(float x, float y, float rectLeft, float rectTop, float rectRight, float rectBottom) {
     // Kiểm tra nếu x nằm giữa rectLeft và rectRight
     if (x >= rectLeft && x <= rectRight) {
@@ -158,22 +215,45 @@ int main(int argc, char* args[]) {
 
     // Tạo đối tượng Player
     vector<Player*> Players;
+    vector<Player*> P1;
+    vector<Player*> P2;
 
     // 1 CentralMid
-    Player* centralmid = new Player(400, screenHeight / 2 , "germany.png" ,"CM");  // Positioned near the left middle of the screen
+    Player* centralmid = new Player(400, screenHeight / 2 , "argentina.png" ,"CM");  // Positioned near the left middle of the screen
+    Player* centralmid_ = new Player(screenWidth - 400, screenHeight / 2, "germany.png", "CM1");  // Positioned near the left middle of the screen
     Players.push_back(centralmid);
+    Players.push_back(centralmid_);
+    P1.push_back(centralmid);
+    P2.push_back(centralmid_);
 
     // 2 Defenders
-    Player* defender1 = new Player(200, screenHeight / 3, "italy.png", "LCB");  // Positioned slightly to the right and higher than the goalkeeper
-    Player* defender2 = new Player(200, 2 * screenHeight / 3, "france.png" , "RCB");  // Positioned slightly to the right and lower than the goalkeeper
+    Player* defender1 = new Player(200, screenHeight / 3, "argentina.png", "LCB");  // Positioned slightly to the right and higher than the goalkeeper
+    Player* defender2 = new Player(200, 2 * screenHeight / 3, "argentina.png" , "RCB");  // Positioned slightly to the right and lower than the goalkeeper
+    Player* defender1_ = new Player(screenWidth - 200, screenHeight / 3, "germany.png", "LCB1");  // Positioned slightly to the right and higher than the goalkeeper
+    Player* defender2_ = new Player(screenWidth - 200, 2 * screenHeight / 3, "germany.png", "RCB1");  // Positioned slightly to the right and lower than the goalkeeper
     Players.push_back(defender1);
     Players.push_back(defender2);
+    Players.push_back(defender1_);
+    Players.push_back(defender2_);
+    P1.push_back(defender1);
+    P1.push_back(defender2);
+    P2.push_back(defender1_);
+    P2.push_back(defender2_);
+
 
     // 2 Forwards
-    Player* forward1 = new Player(500, screenHeight / 4, "spain.png", "LW");  // Positioned further to the right and higher
+    Player* forward1 = new Player(500, screenHeight / 4, "argentina.png", "LW");  // Positioned further to the right and higher
     Player* forward2 = new Player(500, 3 * screenHeight / 3 - screenHeight / 4, "argentina.png", "RW");  // Positioned further to the right and lower
+    Player* forward1_ = new Player(screenWidth - 500, screenHeight / 4, "germany.png", "LW1");  // Positioned further to the right and higher
+    Player* forward2_ = new Player(screenWidth - 500, 3 * screenHeight / 3 - screenHeight / 4, "germany.png", "RW1");  // Positioned further to the right and lower
     Players.push_back(forward1);
     Players.push_back(forward2);
+    Players.push_back(forward1_);
+    Players.push_back(forward2_);
+    P1.push_back(forward1);
+    P1.push_back(forward2);
+    P2.push_back(forward1_);
+    P2.push_back(forward2_);
 
 
     Ball* ball = new Ball(screenWidth / 2 - 64, screenHeight / 2 - 32);
@@ -181,8 +261,10 @@ int main(int argc, char* args[]) {
     // Init Map
     initMap("Green.png");
     forward1->tar = true;
+    // forward1_->tar2 = true;
     const Uint8* keyState = SDL_GetKeyboardState(NULL);
     bool switchPressed = false;
+    bool switchPressed_P2 = false;
     // Game loop
     while (!quit) {
         // Kiểm tra sự kiện
@@ -193,14 +275,20 @@ int main(int argc, char* args[]) {
         }
         
         // Lấy trạng thái bàn phím
-        for (Player* x : Players)
+        
+        for (Player* x : P1)
         {
             x->handleInput(keyState);
         }
+        /*
+        for (Player* x : P2)
+        {
+            x->handleInput_P2(keyState);
+        }*/
         // ball->handleInput(keyState);
 
-        switchPlayer(keyState, Players, switchPressed, ball);
-
+        switchPlayer(keyState, P1, switchPressed, ball);
+        switchPlayer_P2(keyState, P2, switchPressed_P2, ball);
         // Xử lý input
         
 
@@ -305,7 +393,10 @@ int main(int argc, char* args[]) {
             // Chọn texture đúng cho từng player
             // hàm này chỉ vẽ cho x nào đg có thuộc tính tar là true
             ball->update(x);
-
+            if (x->tar || x->tar2)
+            {
+                // x->moveTowards(ball->x, ball->y);
+            }
 
             // x->render(renderer, x->grayTexture);
              

@@ -11,6 +11,7 @@ public:
     int width, height;  // Kích thước ảnh của Player
     bool shoot;
     bool tar;
+    bool tar2;
     bool next;
     bool collision;
     float velocityX, velocityY;
@@ -22,12 +23,13 @@ public:
     SDL_Texture* texture;  // Texture của Player
     string img_path;
     SDL_Texture* redTexture;
-    SDL_Texture* grayTexture;
+    SDL_Texture* blueTexture;
 
     string player_type;
     float speed = 0.6;
     // Constructor
     Player(float startX, float startY, string tex, string type) : x(startX), y(startY), img_path(tex), player_type(type) {
+        tar2 = false;
         shootStartTime = 0;
         velocityX = 0;
         velocityY = 0;
@@ -43,7 +45,7 @@ public:
         collision_top = false;
         // Tải texture 'red.png' một lần khi khởi tạo
         redTexture = loadTexture("red.png", renderer);
-        grayTexture = loadTexture("gray.png", renderer);
+        blueTexture = loadTexture("blue.png", renderer);
 
     }
 
@@ -54,7 +56,7 @@ public:
         SDL_RenderCopy(renderer, texture, NULL, &dstRect);
 
         // Nếu player này đang được điều khiển, vẽ `red.png`
-        if (tar) {
+        if (tar || tar2) {
             int indicatorWidth, indicatorHeight;
             SDL_QueryTexture(indicatorTexture, NULL, NULL, &indicatorWidth, &indicatorHeight);
 
@@ -142,6 +144,45 @@ public:
 
 
     // Hàm xử lý di chuyển
+    void handleInput_P2(const Uint8* keyState) {
+        if (!tar2) return;
+
+
+
+        if (keyState[SDL_SCANCODE_UP]) {
+            if (y - speed - 64 >= 0 && !collision_top)
+                y -= speed;  // Di chuyển lên
+        }
+        if (keyState[SDL_SCANCODE_DOWN]) {
+            if (y + speed + 32 <= screenHeight && !collision_down)
+                y += speed;  // Di chuyển xuống
+        }
+        if (keyState[SDL_SCANCODE_LEFT] && !collision_left) {
+            if (x - speed >= 0)
+                x -= speed;  // Di chuyển sang trái
+        }
+        if (keyState[SDL_SCANCODE_RIGHT]) {
+            if (x + speed + 64 <= screenWidth && !collision_right)
+                x += speed;  // Di chuyển sang phải
+        }
+
+        if (keyState[SDL_SCANCODE_SPACE]) {
+            if (this->shootStartTime == 0) {
+                this->shootStartTime = SDL_GetTicks();
+            }
+            // Đặt màu trắng cho renderer
+            this->shoot = true;
+            Uint32 currentTime = SDL_GetTicks();
+            if (currentTime - this->shootStartTime >= 3000) {
+                this->shoot = false;
+                this->shootStartTime = 0;  // Reset the timer
+            }
+            SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // (r, g, b, a) màu trắng
+            drawCircleWithBorder(renderer, x + 32, y + 32, 40, 5);
+            SDL_RenderPresent(renderer);
+
+        }
+    }
     void handleInput(const Uint8* keyState) {
         if (!tar) return;
         
@@ -328,6 +369,26 @@ public:
                     // Xử lý cho player RW
                     moveTowards(358, 450);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(233, 150);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(483, 315);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(358, 450);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(733, 255);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(608, 450);
+                }
             }
             else if (nameArea == "B")
             {
@@ -356,6 +417,26 @@ public:
                 {
                     // Xử lý cho player RW
                     moveTowards(358, 450);
+                }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(483, 205);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(608, 590);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(733, 310);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(733, 205);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(855, 450);
                 }
             }
             else if (nameArea == "C")
@@ -386,6 +467,26 @@ public:
                     // Xử lý cho player RW
                     moveTowards(733, 590);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(858, 205);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(733, 310);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(858, 310);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(983, 310);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(983, 450);
+                }
             }
             else if (nameArea == "D")
             {
@@ -414,6 +515,26 @@ public:
                 {
                     // Xử lý cho player RW
                     moveTowards(858, 590);
+                }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(858, 205);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(733, 310);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(983, 310);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(1108-64, 310-64);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(983, 450);
                 }
             }
             else if (nameArea == "E")
@@ -444,6 +565,26 @@ public:
                     // Xử lý cho player RW
                     moveTowards(233, 450);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(300, 310);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(300, 590);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(233, 450);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(608, 310);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(608, 590);
+                }
             }
             else if (nameArea == "F")
             {
@@ -472,6 +613,26 @@ public:
                 {
                     // Xử lý cho player RW
                     moveTowards(483, 590);
+                }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(483, 310);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(483, 590);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(608, 450);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(733, 310);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(858, 590);
                 }
             }
             else if (nameArea == "G")
@@ -502,6 +663,26 @@ public:
                     // Xử lý cho player RW
                     moveTowards(858, 600);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(858, 310);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(858, 590);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(858-64, 450-64);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(983, 310);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(983, 590);
+                }
             }
             else if (nameArea == "H")
             {
@@ -530,6 +711,26 @@ public:
                 {
                     // Xử lý cho player RW
                     moveTowards(983, 590);
+                }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(983+64, 310+64);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(983, 590);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(1000, 450);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(1108-64, 310-64);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(1108-64, 590-63);
                 }
             }
             else if (nameArea == "I")
@@ -560,6 +761,26 @@ public:
                     // Xử lý cho player RW
                     moveTowards(233, 695);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(358, 590);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(233, 695);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(358, 695);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(608, 450);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(608, 695);
+                }
             }
             else if (nameArea == "J")
             {
@@ -588,6 +809,26 @@ public:
                 {
                     // Xử lý cho player RW
                     moveTowards(483, 700);
+                }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(483, 630);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(483, 750);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(608, 695);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(608, 590);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(733, 630);
                 }
             }
             else if (nameArea == "K")
@@ -618,9 +859,28 @@ public:
                     // Xử lý cho player RW
                     moveTowards(733, 590);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(608, 450);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(733, 685);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(733, 590);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(858, 450);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(983, 590);
+                }
             }
-            else
-            {
+            else if (nameArea == "L"){
                 // Xử lý cho khu vực L
                 if (player_type == "CM")
                 {
@@ -647,9 +907,30 @@ public:
                     // Xử lý cho player RW
                     moveTowards(983, 700);
                 }
+                else if (player_type == "LW1")
+                {
+                    moveTowards(858, 590);
+                }
+                else if (player_type == "RW1")
+                {
+                    moveTowards(858, 685);
+                }
+                else if (player_type == "CM1")
+                {
+                    moveTowards(983, 450);
+                }
+                else if (player_type == "LCB1")
+                {
+                    moveTowards(1108, 450);
+                }
+                else if (player_type == "RCB1")
+                {
+                    moveTowards(983, 630);
+                }
             }
 
         }
     }
+
 }
 ;
