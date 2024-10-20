@@ -46,36 +46,65 @@ void drawThickRect(SDL_Renderer* renderer, SDL_Rect rect, int thickness) {
         rect.h -= 2;
     }
 }
-void switchPlayer(const Uint8* keyState, vector<Player*>& Players, bool& switchPressed) {  // Pass by reference
+void switchPlayer(const Uint8* keyState, vector<Player*>& Players, bool& switchPressed, Ball* ball) {  // Thêm tham số screenWidth
     if (keyState[SDL_SCANCODE_F]) {
-        if (!switchPressed) {  // Only switch if the key was not pressed in the last frame
+        if (!switchPressed) {  // Chỉ chuyển đổi nếu phím chưa được nhấn ở frame trước
             cout << "PRESS F" << endl;
             cout << "Players size: " << Players.size() << endl;
 
-            if (Players.size() <= 1) return;  // No need to switch if only one player
+            if (Players.size() <= 1) return;  // Không cần chuyển đổi nếu chỉ có 1 player
 
-            for (size_t i = 0; i < Players.size(); i++) {
-                if (Players[i]->tar == true) {  // Found the active player
-                    Players[i]->tar = false;    // Deactivate current player
+            bool canSwitch = true;
 
-                    // Activate the next player, wrapping to the start if at the end of the list
-                    if (i + 1 < Players.size()) {
-                        Players[i + 1]->tar = true;
+            // Kiểm tra vị trí của bóng, chỉ cho phép chuyển nếu bóng > screenWidth / 2
+            if (ball->x > screenWidth / 2) {
+                canSwitch = false;
+
+                // Tìm player hiện tại và chuyển sang player khác nếu không phải LCB hoặc RCB
+                for (size_t i = 0; i < Players.size(); i++) {
+                    if (Players[i]->tar == true) {  // Tìm player hiện tại
+                        Players[i]->tar = false;    // Ngưng kích hoạt player hiện tại
+
+                        // Tìm player tiếp theo có thuộc tính player_type != LCB và != RCB
+                        size_t nextPlayerIndex = (i + 1) % Players.size();
+                        for (size_t j = 0; j < Players.size(); j++) {
+                            size_t candidateIndex = (nextPlayerIndex + j) % Players.size();
+                            if (Players[candidateIndex]->player_type != "LCB" && Players[candidateIndex]->player_type != "RCB") {
+                                Players[candidateIndex]->tar = true;  // Kích hoạt player mới
+                                canSwitch = true;
+                                break;  // Thoát khỏi vòng lặp sau khi tìm được player hợp lệ
+                            }
+                        }
+
+                        break;  // Thoát khỏi vòng lặp sau khi xử lý xong player hiện tại
                     }
-                    else {
-                        Players[0]->tar = true;  // Wrap around to the first player
-                    }
-
-                    break;  // Exit after switching players
                 }
             }
-            switchPressed = true;  // Set the flag to indicate the key is held down
+            else {
+                // Chuyển đổi như bình thường nếu bóng không nằm ở phần phải màn hình
+                for (size_t i = 0; i < Players.size(); i++) {
+                    if (Players[i]->tar == true) {  // Tìm player hiện tại
+                        Players[i]->tar = false;    // Ngưng kích hoạt player hiện tại
+
+                        // Kích hoạt player tiếp theo
+                        size_t nextPlayerIndex = (i + 1) % Players.size();
+                        Players[nextPlayerIndex]->tar = true;
+
+                        break;  // Thoát khỏi vòng lặp sau khi chuyển đổi
+                    }
+                }
+            }
+
+            if (canSwitch) {
+                switchPressed = true;  // Đặt cờ để chỉ ra rằng phím đã được giữ
+            }
         }
     }
     else {
-        switchPressed = false;  // Reset the flag when the key is released
+        switchPressed = false;  // Reset cờ khi phím được nhả ra
     }
 }
+
 bool isPointInsideRectangle(float x, float y, float rectLeft, float rectTop, float rectRight, float rectBottom) {
     // Kiểm tra nếu x nằm giữa rectLeft và rectRight
     if (x >= rectLeft && x <= rectRight) {
@@ -168,8 +197,9 @@ int main(int argc, char* args[]) {
         {
             x->handleInput(keyState);
         }
+        // ball->handleInput(keyState);
 
-        switchPlayer(keyState, Players, switchPressed);
+        switchPlayer(keyState, Players, switchPressed, ball);
 
         // Xử lý input
         
@@ -204,11 +234,17 @@ int main(int argc, char* args[]) {
         SDL_RenderDrawLine(renderer, 78, 310, 78, 590);
         SDL_RenderDrawLine(renderer, 1138, 310, 1138, 590);
 
+
+        string area = getBallAreaName(ball->x, ball->y);
+
         //////////////////////////////////////////////////////////////////////////////
         // va chạm giữa người chơi và quả bóng
         for (Player* x : Players)
         {
-
+            x->move(area);
+            x->render(renderer, x->redTexture);
+            
+            
             // Coordinates of the ball (replace with actual ball coordinates)
             float ballX = ball->x;
             float ballY = ball->y;
@@ -269,7 +305,8 @@ int main(int argc, char* args[]) {
             // Chọn texture đúng cho từng player
             // hàm này chỉ vẽ cho x nào đg có thuộc tính tar là true
             ball->update(x);
-            x->render(renderer, x->redTexture);
+
+
             // x->render(renderer, x->grayTexture);
              
         }

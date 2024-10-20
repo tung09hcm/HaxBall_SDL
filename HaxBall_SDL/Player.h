@@ -228,7 +228,7 @@ public:
         float dirX = ballX - x;
         float dirY = ballY - y;
         float distanceToBall = sqrt(dirX * dirX + dirY * dirY);
-        float speed = 0.2f;  // Tốc độ di chuyển về phía quả bóng
+        float speed = 0.6f;  // Tốc độ di chuyển về phía quả bóng
         // Nếu cầu thủ ở gần quả bóng (khoảng cách nhỏ hơn 32 pixel)
         if (distanceToBall < 32) {
             // Tính toán hướng từ quả bóng đến gôn
@@ -298,7 +298,7 @@ public:
     {
         // khúc này mệt vcl
         // nhớ xử lý cho bot hoặc P2 CM1 LCB1 RCB1 LW1 RW1
-        if (!tar)
+        if (!tar )
         {
             if (nameArea == "A")
             {
@@ -306,22 +306,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(233, 310);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(108, 310);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(108, 450);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(358, 205);
                 }
-                else 
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(358, 450);
                 }
             }
             else if (nameArea == "B")
@@ -330,22 +335,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(388, 310);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(263,310);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(233, 450);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(388, 205);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(358, 450);
                 }
             }
             else if (nameArea == "C")
@@ -354,22 +364,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(608, 450);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(358, 310);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(358, 450);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(733, 205);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(733, 590);
                 }
             }
             else if (nameArea == "D")
@@ -378,22 +393,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(858, 310);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(733, 205);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(608, 450);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(983, 150);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(858, 590);
                 }
             }
             else if (nameArea == "E")
@@ -402,22 +422,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(108, 310);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(108, 400);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(108, 550);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(205, 258);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(233, 450);
                 }
             }
             else if (nameArea == "F")
@@ -426,22 +451,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(358, 450);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(233, 310);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(108, 450);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(483, 310);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(483, 590);
                 }
             }
             else if (nameArea == "G")
@@ -450,22 +480,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(608, 460);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(483, 320);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(358, 460);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(733, 320);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(858, 600);
                 }
             }
             else if (nameArea == "H")
@@ -474,22 +509,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(858, 450);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(608, 360);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(608, 550);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(983, 310);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(983, 590);
                 }
             }
             else if (nameArea == "I")
@@ -498,22 +538,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(233, 590);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(108, 450);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(108, 590);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(233, 450);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(233, 695);
                 }
             }
             else if (nameArea == "J")
@@ -522,22 +567,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(358, 590);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(250, 450);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(358, 695);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(483, 500);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(483, 700);
                 }
             }
             else if (nameArea == "K")
@@ -546,22 +596,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(608, 450);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(358, 310);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(358, 450);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(733, 205);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(733, 590);
                 }
             }
             else
@@ -570,22 +625,27 @@ public:
                 if (player_type == "CM")
                 {
                     // Xử lý cho player CM
+                    moveTowards(733, 590);
                 }
                 else if (player_type == "LCB")
                 {
                     // Xử lý cho player LCB
+                    moveTowards(608, 450);
                 }
                 else if (player_type == "RCB")
                 {
                     // Xử lý cho player RCB
+                    moveTowards(608, 695);
                 }
                 else if (player_type == "LW")
                 {
                     // Xử lý cho player LW
+                    moveTowards(983, 590);
                 }
-                else
+                else if (player_type == "RW")
                 {
                     // Xử lý cho player RW
+                    moveTowards(983, 700);
                 }
             }
 

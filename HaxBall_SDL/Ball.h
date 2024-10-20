@@ -114,6 +114,24 @@ public:
 
 	}
 
+	void handleInput(const Uint8* keyState) {
+
+		float speed = 1;
+
+		if (keyState[SDL_SCANCODE_W]) {
+				y -= speed;  // Di chuyển lên
+		}
+		if (keyState[SDL_SCANCODE_S]) {
+				y += speed;  // Di chuyển xuống
+		}
+		if (keyState[SDL_SCANCODE_A]) {
+				x -= speed;  // Di chuyển sang trái
+		}
+		if (keyState[SDL_SCANCODE_D]) {
+				x += speed;  // Di chuyển sang phải
+		}
+
+	}
 
 	void applyForce(float forceX, float forceY) {
 		velocityX = forceX;
