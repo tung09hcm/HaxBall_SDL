@@ -8,6 +8,7 @@
 #include "Map.h"
 #include "Ball.h"
 #include "Cal.h"
+#include <SDL_ttf.h>
 using namespace std;
 
 // Hàm khởi tạo SDL
@@ -46,6 +47,12 @@ void drawThickRect(SDL_Renderer* renderer, SDL_Rect rect, int thickness) {
         rect.h -= 2;
     }
 }
+bool isMouseInRect(int mouseX, int mouseY, SDL_Rect rect) {
+    // Kiểm tra nếu vị trí chuột nằm trong hình chữ nhật
+    return (mouseX >= rect.x && mouseX <= rect.x + rect.w &&
+        mouseY >= rect.y && mouseY <= rect.y + rect.h);
+}
+
 void switchPlayer(const Uint8* keyState, vector<Player*>& Players, bool& switchPressed, Ball* ball) {  // Thêm tham số screenWidth
     if (keyState[SDL_SCANCODE_F]) {
         if (!switchPressed) {  // Chỉ chuyển đổi nếu phím chưa được nhấn ở frame trước
@@ -190,6 +197,23 @@ string getBallAreaName(float x, float y)
     if (isPointInsideRectangle(x, y, 858, 590, 1108, 800)) return "L";
 
 }
+
+void renderText(SDL_Renderer* renderer, const std::string& message, TTF_Font* font, SDL_Color color, int x, int y) {
+    SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, message.c_str(), color);
+    SDL_Texture* messageTexture = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
+
+    SDL_Rect messageRect;
+    messageRect.x = x;
+    messageRect.y = y;
+    messageRect.w = surfaceMessage->w;
+    messageRect.h = surfaceMessage->h;
+
+    SDL_RenderCopy(renderer, messageTexture, NULL, &messageRect);
+
+    SDL_FreeSurface(surfaceMessage);
+    SDL_DestroyTexture(messageTexture);
+}
+
 int main(int argc, char* args[]) {
 
     // Khởi tạo SDL
@@ -201,9 +225,14 @@ int main(int argc, char* args[]) {
     {
         cout << "ERROR renderer is nullptr" << endl;
     }
-
-
-
+    TTF_Init();
+    TTF_Font* font = TTF_OpenFont("sport.ttf", 72);  // 72 is the font size for the title
+    TTF_Font* font_small = TTF_OpenFont("sport.ttf", 50);  // 72 is the font size for the title
+    if (!font) {
+        std::cerr << "Failed to load font: " << TTF_GetError() << std::endl;
+        return -1;
+    }
+    cout << "tín hiệu" << endl;
     SDL_Event e;
     SDL_Rect rect = { 108, 100, 1000, 700 };
     SDL_Rect rect_ext = { 108, 100, 500, 700 };
@@ -256,16 +285,79 @@ int main(int argc, char* args[]) {
     P2.push_back(forward2_);
 
 
-    Ball* ball = new Ball(screenWidth / 2 - 64, screenHeight / 2 - 32);
-    bool quit = false;
+    Ball* ball = new Ball(608 - 16, 450 - 16);
+
     // Init Map
     initMap("Green.png");
+
+
+
     forward1->tar = true;
     // forward1_->tar2 = true;
+    bool player_vs_player = false;
     const Uint8* keyState = SDL_GetKeyboardState(NULL);
     bool switchPressed = false;
     bool switchPressed_P2 = false;
     // Game loop
+    bool quit = false;
+    bool game_menu_loop = true;
+    SDL_Color white = { 255, 255, 255, 255 };
+    SDL_Color red = { 255, 0, 0, 255 }; // đỏ
+    SDL_Rect buttonRect = { screenWidth / 2 - 240, screenWidth / 2 - 230, 515, 60 };
+    SDL_Rect buttonRect_2 = { screenWidth / 2 - 240, screenWidth / 2 - 100, 515, 60 };
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+    while (game_menu_loop)
+    {
+        
+
+        while (SDL_PollEvent(&e) != 0) {
+            if (e.type == SDL_QUIT) {
+                game_menu_loop = false;
+                quit = true;
+            }
+            if (e.type == SDL_MOUSEBUTTONDOWN) {
+                // Lấy tọa độ chuột
+                int mouseX, mouseY;
+                SDL_GetMouseState(&mouseX, &mouseY);
+
+                // Kiểm tra nếu chuột nằm trong khu vực hình chữ nhật
+                if (isMouseInRect(mouseX, mouseY, buttonRect)) {
+                    std::cout << "Mouse clicked inside the rectangle!" << std::endl;
+                    forward1_->tar2 = true;
+                    game_menu_loop = false;
+                    player_vs_player = true;
+                }
+                if (isMouseInRect(mouseX, mouseY, buttonRect_2)) {
+                    std::cout << "Mouse clicked inside the rectangle 2!" << std::endl;
+                    game_menu_loop = false;
+                }
+            }
+        }
+        
+        // Vẽ Map
+        loadMap();
+        
+        drawThickRect(renderer, buttonRect, 2);
+        drawThickRect(renderer, buttonRect_2, 2);
+        // drawCircleWithBorder(renderer, 604, 450, 100, 3);
+        // Render title "HAXBALL"
+        renderText(renderer, "HAXBALL", font, white, screenWidth / 2 - 150, screenHeight / 4);  // Hiển thị tiêu đề
+
+        // Render buttons
+        renderText(renderer, "Player vs Player", font_small , white, screenWidth / 2 - 220, screenWidth / 2 - 220);
+        renderText(renderer, "Player vs BOT", font_small, white, screenWidth / 2 - 170, screenHeight / 2 + 100);
+
+        // Update screen
+        SDL_RenderPresent(renderer);    
+        // Xóa màn hình
+        SDL_RenderClear(renderer);
+    }
+    
+
+
+
+
+    
     while (!quit) {
         // Kiểm tra sự kiện
         while (SDL_PollEvent(&e) != 0) {
@@ -280,15 +372,20 @@ int main(int argc, char* args[]) {
         {
             x->handleInput(keyState);
         }
-        /*
-        for (Player* x : P2)
+        if (player_vs_player)
         {
-            x->handleInput_P2(keyState);
-        }*/
+            for (Player* x : P2)
+            {
+                x->handleInput_P2(keyState);
+            }
+            switchPlayer_P2(keyState, P2, switchPressed_P2, ball);
+        }
+        
+        
         // ball->handleInput(keyState);
 
         switchPlayer(keyState, P1, switchPressed, ball);
-        switchPlayer_P2(keyState, P2, switchPressed_P2, ball);
+        
         // Xử lý input
         
 

@@ -40,6 +40,9 @@
     <Image Include="soccer-ball.png" />
     <Image Include="spain.png" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="sport.ttf" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -93,8 +96,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>C:\Users\THANH TUNG\Desktop\library\SDL2-devel-2.30.7-VC\SDL2-2.30.7\include;C:\Users\THANH TUNG\Desktop\library\SDL2_image-2.8.2\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Users\THANH TUNG\Desktop\library\SDL2_image-2.8.2\lib\x64;C:\Users\THANH TUNG\Desktop\library\SDL2-devel-2.30.7-VC\SDL2-2.30.7\lib\x64;$(LibraryPath)</LibraryPath>
+    <IncludePath>C:\Users\THANH TUNG\Desktop\library\SDL2_ttf-devel-2.22.0-VC\SDL2_ttf-2.22.0\include;C:\Users\THANH TUNG\Desktop\library\SDL2-devel-2.30.7-VC\SDL2-2.30.7\include;C:\Users\THANH TUNG\Desktop\library\SDL2_image-2.8.2\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\THANH TUNG\Desktop\library\SDL2_ttf-devel-2.22.0-VC\SDL2_ttf-2.22.0\lib\x64;C:\Users\THANH TUNG\Desktop\library\SDL2_image-2.8.2\lib\x64;C:\Users\THANH TUNG\Desktop\library\SDL2-devel-2.30.7-VC\SDL2-2.30.7\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,7 +137,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
