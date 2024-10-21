@@ -52,7 +52,20 @@ public:
         blueTexture = loadTexture("blue.png", renderer);
 
     }
+    bool cal_distance_ex(float playerx, float playery, float x, float y)
+    {
+        float delta_x = playerx + 32 - x - 16;
+        float delta_y = playery + 32 - y - 16;
+        float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
 
+
+        // Kiểm tra nếu khoảng cách nhỏ hơn hoặc bằng tổng bán kính
+        if (distance <= 48)
+        {
+            return true;
+        }
+        return false;
+    }
     // Hàm vẽ player trên màn hình
     void render(SDL_Renderer* renderer, SDL_Texture* indicatorTexture) {
         // Vẽ nhân vật
@@ -70,19 +83,12 @@ public:
             // Vẽ `red.png` để chỉ định nhân vật đang được điều khiển
             SDL_RenderCopy(renderer, indicatorTexture, NULL, &dstRect1);
         }
-        else if (next)
-        {
-            int indicatorWidth, indicatorHeight;
-            SDL_QueryTexture(indicatorTexture, NULL, NULL, &indicatorWidth, &indicatorHeight);
-
-            // Tọa độ của chỉ định `red.png` (vẽ lệch lên 32 pixel theo yêu cầu)
-            SDL_Rect dstRect1 = { x + 16, y - 32, indicatorWidth, indicatorHeight };
-
-            // Vẽ `red.png` để chỉ định nhân vật đang được điều khiển
-            SDL_RenderCopy(renderer, indicatorTexture, NULL, &dstRect1);
-        }
     }
-    void update(Player* player) {
+    void update(Player* player, float targetX, float targetY) {
+        if (cal_distance_ex(x + velocityX, y + velocityY, targetX, targetY))
+        {
+            return;
+        }
         // cout << "ball_x: " << this->x + 16;
         // cout << "  ball_y: " << this->y + 16 << endl;
         if (player == nullptr) return;
@@ -148,7 +154,7 @@ public:
 
 
     // Hàm xử lý di chuyển
-    void handleInput_P2(const Uint8* keyState) {
+    void handleInput_P2(const Uint8* keyState, float targetX, float targetY) {
         if (!tar2) return;
         if (tar) return;
 
@@ -187,7 +193,7 @@ public:
 
         }
     }
-    void handleInput(const Uint8* keyState) {
+    void handleInput(const Uint8* keyState, float targetX, float targetY) {
         if (!tar) return;
         if (tar2) return;
 
@@ -338,20 +344,7 @@ public:
         if (std::abs(targetX - this->x) < speed) this->x = targetX;
         if (std::abs(targetY - this->y) < speed) this->y = targetY;
     }
-    bool cal_distance_ex(float playerx, float playery, float x, float y)
-    {
-        float delta_x = playerx + 32 - x - 16;
-        float delta_y = playery + 32 - y - 16;
-        float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
-
-
-        // Kiểm tra nếu khoảng cách nhỏ hơn hoặc bằng tổng bán kính
-        if (distance <= 48)
-        {
-            return true;
-        }
-        return false;
-    }
+    
     void moveTowards(float targetX, float targetY, float speed) {
         if (cal_distance_ex(x, y, targetX, targetY) )
         {
@@ -390,6 +383,10 @@ public:
     {
         // khúc này mệt vcl
         // nhớ xử lý cho bot hoặc P2 CM1 LCB1 RCB1 LW1 RW1
+        if (cal_distance_ex(x, y, targetX, targetY))
+        {
+            return;
+        }
         if (!tar && player_type != "CM" && player_type != "CM1" &&!tar2)
         {
             if (nameArea == "A")
@@ -981,10 +978,7 @@ public:
             }
 
         }
-        if (cal_distance_ex(x, y, targetX, targetY))
-        {
-            return;
-        }
+        
 
     }
 

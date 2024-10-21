@@ -380,8 +380,6 @@ int main(int
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
     while (game_menu_loop)
     {
-        
-
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
                 game_menu_loop = false;
@@ -427,12 +425,40 @@ int main(int
     
 
 
-
-    int goalLeft = 0;
-    int goalRight = 0;
     Uint32 pauseStart = 0;  // Lưu thời gian bắt đầu tạm dừng
     // bool isPaused = false;  // Biến để theo dõi trạng thái tạm dừng
+    bool stop = false;
+    int goalLeft = 0;
+    int goalRight = 0;
     while (!quit) {
+        SDL_Event event;
+        while (SDL_PollEvent(&event) != 0) {
+
+            if (event.type == SDL_QUIT) {
+                quit = true;
+            }
+            if (event.type == SDL_KEYDOWN) {
+                if (event.key.keysym.sym == SDLK_ESCAPE) {
+                    stop = !stop; // Thay đổi trạng thái dừng khi nhấn ESCAPE
+                }
+            }
+        }
+        while (stop)
+        {
+            SDL_PollEvent(&event);
+            
+            // Update screen
+            
+            // Xóa màn hình
+            loadMap();
+            renderText(renderer, "Press Escape To Continue", font_small, white, screenWidth / 2 - 320, screenWidth / 2 - 220);
+            SDL_RenderPresent(renderer);
+            SDL_RenderClear(renderer);
+            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) {
+                stop = false; // Tiếp tục khi nhấn ESCAPE lại
+            }
+        }
+        
         
         if (goalCheckLeft(ball))
         {
@@ -454,23 +480,19 @@ int main(int
         }
 
         // Kiểm tra sự kiện
-        while (SDL_PollEvent(&e) != 0) {
-            if (e.type == SDL_QUIT) {
-                quit = true;
-            }
-        }
+        
         
         // Lấy trạng thái bàn phím
         
         for (Player* x : P1)
         {
-            x->handleInput(keyState);
+            x->handleInput(keyState, ball->x, ball->y);
         }
         if (player_vs_player)
         {
             for (Player* x : P2)
             {
-                x->handleInput_P2(keyState);
+                x->handleInput_P2(keyState, ball->x, ball->y);
             }
             switchPlayer_P2(keyState, P2, switchPressed_P2, ball);
         }
@@ -489,7 +511,10 @@ int main(int
         // Xóa màn hình
         SDL_RenderClear(renderer);
         // Vẽ Map
-        loadMap();
+        loadMap(goalLeft,goalRight);
+        renderText(renderer, to_string(goalLeft), font, white, 515,0);
+        renderText(renderer, ":", font, white, 593, 0);
+        renderText(renderer, to_string(goalRight), font, white, 650,0);
 
         // Vẽ hình chữ nhật chỉ có viền
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255); // Màu viền trắng
@@ -501,17 +526,17 @@ int main(int
         SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // đỏ
         // Vẽ đường thẳng (từ điểm x1, y1 đến x2, y2)
         // Màu viền đỏ
-        SDL_RenderDrawLine(renderer, 108, 100, 108, 800);
-        SDL_RenderDrawLine(renderer, 108, 100, 1108, 100);
-        SDL_RenderDrawLine(renderer, 108, 800, 1108, 800);
-        SDL_RenderDrawLine(renderer, 1108, 100, 1108, 800);
+        // SDL_RenderDrawLine(renderer, 108, 100, 108, 800);
+        // SDL_RenderDrawLine(renderer, 108, 100, 1108, 100);
+        // SDL_RenderDrawLine(renderer, 108, 800, 1108, 800);
+        // SDL_RenderDrawLine(renderer, 1108, 100, 1108, 800);
 
-        SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // xanh dương
+        // SDL_SetRenderDrawColor(renderer, 0, 0, 255, 255); // xanh dương
 
-        SDL_RenderDrawLine(renderer, 78, 310, 1138, 310);
-        SDL_RenderDrawLine(renderer, 78, 590, 1138, 590);
-        SDL_RenderDrawLine(renderer, 78, 310, 78, 590);
-        SDL_RenderDrawLine(renderer, 1138, 310, 1138, 590);
+        // SDL_RenderDrawLine(renderer, 78, 310, 1138, 310);
+        // SDL_RenderDrawLine(renderer, 78, 590, 1138, 590);
+        // SDL_RenderDrawLine(renderer, 78, 310, 78, 590);
+        // SDL_RenderDrawLine(renderer, 1138, 310, 1138, 590);
 
 
         string area = getBallAreaName(ball->x, ball->y);
@@ -570,7 +595,7 @@ int main(int
                 float pushForce = 0.2f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
                 ball->applyForce(dx * pushForce, dy * pushForce);
                 x->applyForce(-dx * pushForce, -dy * pushForce);
-                x->update(x);
+                x->update(x, ball->x, ball->y);
                 
             }
             else {
@@ -632,8 +657,8 @@ int main(int
                     player2->applyForce(-dx * pushForce, -dy * pushForce); // Đẩy player2 đi xa player1
 
                     // Cập nhật trạng thái của cả hai người chơi
-                    player1->update(player2);
-                    player2->update(player1);
+                    player1->update(player2, ball->x, ball->y);
+                    player2->update(player1, ball->x, ball->y);
 
                 }
                 else {
