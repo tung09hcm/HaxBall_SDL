@@ -4,7 +4,10 @@
 #include <iostream>
 #include <string>
 #include "Common.h"
+
 using namespace std;
+
+
 class Player {
 public:
     float x, y;  // Tọa độ của Player
@@ -26,7 +29,8 @@ public:
     SDL_Texture* blueTexture;
 
     string player_type;
-    float speed = 0.6;
+    float speed = 0.6f;
+
     // Constructor
     Player(float startX, float startY, string tex, string type) : x(startX), y(startY), img_path(tex), player_type(type) {
         tar2 = false;
@@ -146,7 +150,7 @@ public:
     // Hàm xử lý di chuyển
     void handleInput_P2(const Uint8* keyState) {
         if (!tar2) return;
-
+        if (tar) return;
 
 
         if (keyState[SDL_SCANCODE_UP]) {
@@ -166,7 +170,7 @@ public:
                 x += speed;  // Di chuyển sang phải
         }
 
-        if (keyState[SDL_SCANCODE_SPACE]) {
+        if (keyState[SDL_SCANCODE_KP_ENTER]) {
             if (this->shootStartTime == 0) {
                 this->shootStartTime = SDL_GetTicks();
             }
@@ -185,27 +189,27 @@ public:
     }
     void handleInput(const Uint8* keyState) {
         if (!tar) return;
-        
+        if (tar2) return;
 
 
-        if (keyState[SDL_SCANCODE_W]) {
+        if (keyState[SDL_SCANCODE_W] && tar) {
             if(y - speed - 64 >= 0 && !collision_top)
                 y -= speed;  // Di chuyển lên
         }
-        if (keyState[SDL_SCANCODE_S]) {
+        if (keyState[SDL_SCANCODE_S] && tar) {
             if ( y + speed + 32 <= screenHeight && !collision_down)
                 y += speed;  // Di chuyển xuống
         }
-        if (keyState[SDL_SCANCODE_A] && !collision_left) {
+        if (keyState[SDL_SCANCODE_A] && !collision_left && tar) {
             if( x - speed >= 0 )
                 x -= speed;  // Di chuyển sang trái
         }
-        if (keyState[SDL_SCANCODE_D]) {
+        if (keyState[SDL_SCANCODE_D] && tar) {
             if( x+ speed + 64 <= screenWidth && !collision_right)
                 x += speed;  // Di chuyển sang phải
         }
 
-        if (keyState[SDL_SCANCODE_SPACE]) {
+        if (keyState[SDL_SCANCODE_SPACE] && tar) {
             if (this->shootStartTime == 0) {
                 this->shootStartTime = SDL_GetTicks();
             }
@@ -334,12 +338,59 @@ public:
         if (std::abs(targetX - this->x) < speed) this->x = targetX;
         if (std::abs(targetY - this->y) < speed) this->y = targetY;
     }
+    bool cal_distance_ex(float playerx, float playery, float x, float y)
+    {
+        float delta_x = playerx + 32 - x - 16;
+        float delta_y = playery + 32 - y - 16;
+        float distance = sqrt(delta_x * delta_x + delta_y * delta_y);
 
-    void move(string nameArea)
+
+        // Kiểm tra nếu khoảng cách nhỏ hơn hoặc bằng tổng bán kính
+        if (distance <= 48)
+        {
+            return true;
+        }
+        return false;
+    }
+    void moveTowards(float targetX, float targetY, float speed) {
+        if (cal_distance_ex(x, y, targetX, targetY) )
+        {
+            return;
+        }
+        // Tính khoảng cách từ vị trí hiện tại đến điểm đích
+        float dx = targetX - this->x;
+        float dy = targetY - this->y;
+
+        // Tính độ dài của vector chỉ hướng
+        float distance = std::sqrt(dx * dx + dy * dy);
+
+        // Kiểm tra nếu đã tới gần điểm đích (hoặc đã tới)
+        if (distance < 1e-3) {
+            // Đặt vị trí chính xác là điểm đích nếu quá gần
+            this->x = targetX;
+            this->y = targetY;
+            return;
+        }
+
+        // Tính hướng di chuyển (vector đơn vị)
+        float directionX = dx / distance;
+        float directionY = dy / distance;
+
+        // Cập nhật vị trí dựa trên tốc độ
+        this->x += directionX * speed;
+        this->y += directionY * speed;
+
+        // Kiểm tra nếu vượt qua điểm đích thì dừng tại điểm đích
+        if (std::abs(targetX - this->x) < speed) this->x = targetX;
+        if (std::abs(targetY - this->y) < speed) this->y = targetY;
+    }
+
+    
+    void move(string nameArea, float targetX, float targetY)
     {
         // khúc này mệt vcl
         // nhớ xử lý cho bot hoặc P2 CM1 LCB1 RCB1 LW1 RW1
-        if (!tar )
+        if (!tar && player_type != "CM" && player_type != "CM1" &&!tar2)
         {
             if (nameArea == "A")
             {
@@ -930,6 +981,17 @@ public:
             }
 
         }
+        if (cal_distance_ex(x, y, targetX, targetY))
+        {
+            return;
+        }
+
+    }
+
+    void setPosition(float x, float y)
+    {
+        this->x = x;
+        this->y = y;
     }
 
 }

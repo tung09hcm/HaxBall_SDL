@@ -198,6 +198,31 @@ string getBallAreaName(float x, float y)
 
 }
 
+bool goalCheckLeft(Ball* ball)
+{
+    float x = ball->x + 16;
+    float y = ball->y + 16;
+    // check GOAL LEFT
+    if (x < 108)
+    {
+        cout << "Goal Left " << endl;
+        return true;
+    }
+    else return false;
+}
+bool goalCheckRight(Ball* ball)
+{
+    float x = ball->x;
+    float y = ball->y;
+    // check GOAL LEFT
+    if (x > 1108)
+    {
+        cout << "Goal Right " << endl;
+        return true;
+    }
+    else return false;
+}
+
 void renderText(SDL_Renderer* renderer, const std::string& message, TTF_Font* font, SDL_Color color, int x, int y) {
     SDL_Surface* surfaceMessage = TTF_RenderText_Solid(font, message.c_str(), color);
     SDL_Texture* messageTexture = SDL_CreateTextureFromSurface(renderer, surfaceMessage);
@@ -213,8 +238,55 @@ void renderText(SDL_Renderer* renderer, const std::string& message, TTF_Font* fo
     SDL_FreeSurface(surfaceMessage);
     SDL_DestroyTexture(messageTexture);
 }
-
-int main(int argc, char* args[]) {
+void reDraw(vector<Player*>& Players, Ball* ball)
+{
+    for (Player* x : Players)
+    {
+        if (x->player_type == "CM")
+        {
+            x->setPosition(400, screenHeight / 2);
+        }
+        else if (x->player_type == "RW")
+        {
+            x->setPosition(500, 3 * screenHeight / 3 - screenHeight / 4);
+        }
+        else if (x->player_type == "LW")
+        {
+            x->setPosition(500, screenHeight / 4);  
+        }
+        else if (x->player_type == "RCB")
+        {
+            x->setPosition(200, 2 * screenHeight / 3);
+        }
+        else if (x->player_type == "LCB")
+        {
+            x->setPosition(200, screenHeight / 3);
+        }
+        else if (x->player_type == "CM1")
+        {
+            x->setPosition(screenWidth - 400, screenHeight / 2);
+        }
+        else if (x->player_type == "RW1")
+        {
+            x->setPosition(screenWidth - 500, 3 * screenHeight / 3 - screenHeight / 4);
+        }
+        else if (x->player_type == "LW1")
+        {
+            x->setPosition(screenWidth - 500, screenHeight / 4);
+        }
+        else if (x->player_type == "RCB1")
+        {
+            x->setPosition(screenWidth - 200, 2 * screenHeight / 3);
+        }
+        else if (x->player_type == "LCB1")
+        {
+            x->setPosition(screenWidth - 200, screenHeight / 3);
+        }
+    }
+    ball->setPosition(608 - 16, 450 - 16);
+}
+int main(int
+    argc, char* args[]) {
 
     // Khởi tạo SDL
     if (!init(window, renderer, screenWidth, screenHeight)) {
@@ -286,7 +358,7 @@ int main(int argc, char* args[]) {
 
 
     Ball* ball = new Ball(608 - 16, 450 - 16);
-
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Init Map
     initMap("Green.png");
 
@@ -356,9 +428,31 @@ int main(int argc, char* args[]) {
 
 
 
-
-    
+    int goalLeft = 0;
+    int goalRight = 0;
+    Uint32 pauseStart = 0;  // Lưu thời gian bắt đầu tạm dừng
+    // bool isPaused = false;  // Biến để theo dõi trạng thái tạm dừng
     while (!quit) {
+        
+        if (goalCheckLeft(ball))
+        {
+            pauseStart = SDL_GetTicks();
+            //isPaused = true;
+            cout << " 1GOAL LEFT" << endl;
+            reDraw(Players,ball);
+            goalRight++;
+            // reset 
+                
+        }
+        else if (goalCheckRight(ball))
+        {
+            pauseStart = SDL_GetTicks();
+            // isPaused = true; 
+            cout << " 2GOAL RIGHT" << endl;  
+            reDraw(Players, ball);
+            goalLeft++;
+        }
+
         // Kiểm tra sự kiện
         while (SDL_PollEvent(&e) != 0) {
             if (e.type == SDL_QUIT) {
@@ -426,7 +520,7 @@ int main(int argc, char* args[]) {
         // va chạm giữa người chơi và quả bóng
         for (Player* x : Players)
         {
-            x->move(area);
+            x->move(area, ball->x, ball->y);
             x->render(renderer, x->redTexture);
             
             
@@ -475,7 +569,8 @@ int main(int argc, char* args[]) {
                 // Áp dụng lực đẩy cho Ball
                 float pushForce = 0.2f;  // Điều chỉnh độ lớn lực đẩy theo ý muốn
                 ball->applyForce(dx * pushForce, dy * pushForce);
-                
+                x->applyForce(-dx * pushForce, -dy * pushForce);
+                x->update(x);
                 
             }
             else {
@@ -490,9 +585,10 @@ int main(int argc, char* args[]) {
             // Chọn texture đúng cho từng player
             // hàm này chỉ vẽ cho x nào đg có thuộc tính tar là true
             ball->update(x);
-            if (x->tar || x->tar2)
+            if ((x->player_type == "CM") || (x->player_type == "CM1") )
             {
-                // x->moveTowards(ball->x, ball->y);
+                x->moveTowards(ball->x, ball->y, 0.3);
+                
             }
 
             // x->render(renderer, x->grayTexture);

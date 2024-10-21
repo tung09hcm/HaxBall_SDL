@@ -28,11 +28,7 @@ public:
 	void render(SDL_Renderer* renderer) {
 		SDL_Rect dstRect = { x, y, width, height };
 		SDL_RenderCopy(renderer, texture, NULL, &dstRect);
-		// Đặt màu trắng cho renderer
-		SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
 
-		// Vẽ khung trắng quanh đối tượng
-		SDL_RenderDrawRect(renderer, &dstRect);
 	}
 	void update(Player* player) {
 		// cout << "ball_x: " << this->x + 16;
@@ -137,6 +133,12 @@ public:
 		velocityX = forceX;
 		velocityY = forceY;
 	}
+	void setPosition(float x, float y)
+	{
+		this->x = x;
+		this->y = y;
+	}
+
 	~Ball() {
 		SDL_DestroyTexture(texture);
 	}
